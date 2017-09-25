@@ -1,0 +1,611 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package finalproject;
+
+import java.awt.Image;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+/**
+ *
+ * @author faten
+ */
+public class NewBill extends javax.swing.JPanel {
+
+    Connection conn=null;
+    PreparedStatement pst=null;
+    ResultSet rs=null;
+    Statement st=null;
+    String ImgPath=null;
+    String id="";
+    int itemid;
+    int billno;
+    byte[] index;
+    double price;
+    String name;
+    int quantity;
+    int empid;
+    double netPrice=0;
+    int q2;
+    int q;
+    
+    public NewBill() {
+        initComponents();
+        retrieve();
+        Show_Products_In_JTable();
+    }
+    
+
+
+   
+    //Check Input Fields
+    
+    public boolean checkInputs(){
+        
+            try{
+                //Double.parseDouble(txt_total.getText());
+                Integer.parseInt(txt_num.getText());
+                Integer.parseInt(txt_billNo.getText());
+                return true;
+            }catch(Exception ex)
+            {
+                return false;
+            }
+    }
+    
+    //Display Data in JTable:
+    //      1- Fill ArrayList With The Data
+    
+    public ArrayList<Bill> getBillList(){
+        
+        ArrayList<Bill> billList = new ArrayList<Bill>();
+        conn = MysqlConnect.ConnectDB();
+        String sql = "SELECT * FROM bills";
+        
+        try {
+            
+            
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
+            Bill bill;
+            
+            while(rs.next())
+            {
+               bill = new Bill(rs.getInt("billNo"),rs.getInt("itemID"),rs.getString("name"),rs.getInt("quantity"),Double.parseDouble(rs.getString("price")),rs.getInt("empID"));
+               billList.add(bill);
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Inventotry.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return billList;
+    }
+    
+    
+    //      2- Populate The JTable
+    
+    public void Show_Products_In_JTable(){
+        
+        ArrayList<Bill> list = getBillList();
+        DefaultTableModel model = (DefaultTableModel)JTable_Products.getModel();
+        
+        //clear JTable contents
+        model.setRowCount(0);
+        
+        Object[] row = new Object[6];
+        for(int i = 0; i < list.size() ;i++)
+        {
+            row[0] = list.get(i).getBillId();
+            row[1] = list.get(i).getId();
+            row[2] = list.get(i).getName();
+            row[3] = list.get(i).getQuantity();
+            row[4] = list.get(i).getPrice();
+            row[5] = list.get(i).getEmpId();
+            
+            
+            model.addRow(row);
+            
+        }
+        
+    }
+    
+    
+    public void showItem(int index){
+      
+       
+        //txt_num.setText(Integer.toString(getBillList().get(index).getQuantity()));
+        //img_label.setIcon(ResizeImage(null, getBillList().get(index).getImage()));
+        
+        
+        
+    }
+    private void retrieve(){
+        DefaultComboBoxModel dm = new DBClass().retrieve();
+        jComboBox1.setModel(dm);
+    }
+
+    private boolean enQuantity(int quan, int id)
+    {
+        String sql ="select quantity from inventory WHERE itemID = "+id;
+        conn = MysqlConnect.ConnectDB();
+        try {
+            st=conn.prepareStatement(sql);
+            
+            
+            ResultSet rs=st.executeQuery(sql);
+            if(rs.next())
+            {
+                q = rs.getInt(1);
+                if(q<quan){
+                    return false;
+
+                }
+                q2 = q - quan;
+               sql = "UPDATE inventory SET quantity = ? WHERE itemID = ?";
+               pst=conn.prepareStatement(sql);
+               pst.setInt(1,q2);
+               pst.setInt(2, id);
+               pst.executeUpdate();
+
+            }
+                
+                JOptionPane.showMessageDialog(null, "There is "+q2+" of "+name+" in the inventory");
+            
+            } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+            }
+        return true;
+    }
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        JTable_Products = new javax.swing.JTable();
+        jLabel6 = new javax.swing.JLabel();
+        txt_num = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        txt_total = new javax.swing.JTextField();
+        insert_btn = new javax.swing.JButton();
+        delete_btn = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
+        back_btn = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        bill_btn = new javax.swing.JButton();
+        jLabel10 = new javax.swing.JLabel();
+        txt_billNo = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        txt_price = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+
+        jPanel1.setBackground(new java.awt.Color(0, 102, 102));
+
+        jPanel2.setBackground(new java.awt.Color(0, 102, 102));
+
+        jLabel2.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("New Bill");
+
+        JTable_Products.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        JTable_Products.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Bill number", "item ID", "Name", "quantity", "price", "sellerID"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        JTable_Products.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                JTable_ProductsMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(JTable_Products);
+
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setText("Quantity:");
+
+        txt_num.setText("1");
+        txt_num.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_numActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel8.setText("Total :");
+
+        insert_btn.setBackground(new java.awt.Color(0, 51, 51));
+        insert_btn.setForeground(new java.awt.Color(255, 255, 255));
+        insert_btn.setText("Add Item into Bill");
+        insert_btn.setBorderPainted(false);
+        insert_btn.setOpaque(true);
+        insert_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                insert_btnActionPerformed(evt);
+            }
+        });
+
+        delete_btn.setBackground(new java.awt.Color(0, 51, 51));
+        delete_btn.setForeground(new java.awt.Color(255, 255, 255));
+        delete_btn.setText("Delete");
+        delete_btn.setBorderPainted(false);
+        delete_btn.setOpaque(true);
+        delete_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                delete_btnActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel9.setText("Item");
+
+        back_btn.setBackground(new java.awt.Color(0, 51, 51));
+        back_btn.setForeground(new java.awt.Color(255, 255, 255));
+        back_btn.setText("Back");
+        back_btn.setBorderPainted(false);
+        back_btn.setOpaque(true);
+        back_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                back_btnActionPerformed(evt);
+            }
+        });
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBox1ItemStateChanged(evt);
+            }
+        });
+
+        bill_btn.setBackground(new java.awt.Color(0, 51, 51));
+        bill_btn.setForeground(new java.awt.Color(255, 255, 255));
+        bill_btn.setText("Bill");
+        bill_btn.setBorderPainted(false);
+        bill_btn.setOpaque(true);
+        bill_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bill_btnActionPerformed(evt);
+            }
+        });
+
+        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel10.setText("Bill No:");
+
+        jLabel11.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel11.setText("Price:");
+
+        txt_price.setText("1");
+        txt_price.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_priceActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txt_billNo, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txt_num, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(126, 126, 126)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(bill_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(insert_btn)
+                        .addGap(67, 67, 67)
+                        .addComponent(delete_btn)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addGap(213, 213, 213)
+                .addComponent(jLabel2)
+                .addGap(68, 68, 68)
+                .addComponent(back_btn)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 559, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(back_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel6)
+                            .addComponent(txt_num, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(5, 5, 5)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel11)
+                            .addComponent(txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(bill_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel10)
+                            .addComponent(txt_billNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(4, 4, 4)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(delete_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(insert_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(74, 74, 74))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+        );
+
+        jPanel4.setBackground(new java.awt.Color(0, 102, 102));
+        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(26, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void JTable_ProductsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JTable_ProductsMouseClicked
+
+        int index = JTable_Products.getSelectedRow();
+        showItem(index);
+
+    }//GEN-LAST:event_JTable_ProductsMouseClicked
+
+    private void insert_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insert_btnActionPerformed
+        
+        txt_total.setText("");
+        quantity = Integer.parseInt(txt_num.getText());
+        if(checkInputs() && enQuantity(quantity,itemid)){
+            String sql = "insert into bills(billNo,itemID,quantity,price,empID,name) values(?,?,?,?,?,?)";
+             //billno = Integer.parseInt(txt_billNo.getText());
+             //quantity = Integer.parseInt(txt_num.getText());
+             conn = MysqlConnect.ConnectDB();
+                
+            try {
+                
+                pst=conn.prepareStatement(sql);
+                pst.setInt(1,Integer.parseInt(txt_billNo.getText()));
+                pst.setInt(2, itemid);
+                pst.setInt(3, Integer.parseInt(txt_num.getText()));
+                pst.setDouble(4, price);
+                pst.setInt(5,Finalproject.user);
+             
+                pst.setString(6,name);
+                pst.executeUpdate();
+                Show_Products_In_JTable();
+                
+                JOptionPane.showMessageDialog(null, "Item Added");
+            } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+            }    
+        }else if(!enQuantity(quantity,itemid)){
+       JOptionPane.showMessageDialog(null, "Quantity in the Inventory is not Enough","Error",JOptionPane.ERROR_MESSAGE);
+
+        }
+        else{
+          JOptionPane.showMessageDialog(null, "One Or More Fields Are Empty","Error",JOptionPane.ERROR_MESSAGE);
+        }
+
+
+    }//GEN-LAST:event_insert_btnActionPerformed
+
+    private void delete_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delete_btnActionPerformed
+
+                if(!txt_billNo.getText().equals("")){
+         
+            try {
+                conn = MysqlConnect.ConnectDB();
+                pst = conn.prepareStatement("DELETE FROM bills WHERE billNo = ? ");
+                int id = Integer.parseInt(txt_billNo.getText());
+                pst.setInt(1, id);
+                pst.executeUpdate();
+                Show_Products_In_JTable();
+                JOptionPane.showMessageDialog(null, "Bill Deleted");
+            } catch (SQLException ex) {
+                Logger.getLogger(Inventotry.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, "Bill NOT Deleted","Error",JOptionPane.ERROR_MESSAGE);
+            }
+            
+        }else{
+            JOptionPane.showMessageDialog(null, "Product NOT Deleted : Enter The Product ID","Error",JOptionPane.ERROR_MESSAGE);
+
+        }
+
+    }//GEN-LAST:event_delete_btnActionPerformed
+
+    private void back_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_back_btnActionPerformed
+        Finalproject fp = new Finalproject();
+        fp.changePanel(2);
+    }//GEN-LAST:event_back_btnActionPerformed
+
+    private void bill_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill_btnActionPerformed
+            conn=MysqlConnect.ConnectDB();
+        String Sql="Select quantity,price FROM bills WHERE billNo = '"+txt_billNo.getText()+"'";
+        netPrice = 0;
+        try{
+            st=conn.createStatement();
+           
+            ResultSet rs=st.executeQuery(Sql);
+            while(rs.next()){
+                int a = Integer.parseInt(rs.getString(1));
+                double b = Double.parseDouble(rs.getString(2));
+                double c = a*b;
+                netPrice= netPrice + c;
+            }
+            
+            txt_total.setText(Double.toString(netPrice));
+            
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }//GEN-LAST:event_bill_btnActionPerformed
+
+    private void txt_numActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_numActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_numActionPerformed
+
+    private void jComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox1ItemStateChanged
+        
+         
+        
+        
+        
+        name = jComboBox1.getSelectedItem().toString();
+        
+        conn=MysqlConnect.ConnectDB();
+        String Sql="Select itemID, price FROM inventory WHERE itemName = '"+name+"'";
+        try{
+            st=conn.createStatement();
+           
+            ResultSet rs=st.executeQuery(Sql);
+            if(rs.next())
+            {
+            //index = rs.getBytes("image");
+            itemid = Integer.parseInt(rs.getString(1));
+            price = Double.parseDouble(rs.getString(2));
+            txt_price.setText(Double.toString(price));
+            //showItem(index);
+            //img_label.setIcon(ResizeImage(null, index));
+            //setting the variables
+             
+            }
+            
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+        
+       
+        
+        
+        
+    }//GEN-LAST:event_jComboBox1ItemStateChanged
+
+    private void txt_priceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_priceActionPerformed
+        
+    
+        
+    }//GEN-LAST:event_txt_priceActionPerformed
+
+   
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable JTable_Products;
+    private javax.swing.JButton back_btn;
+    private javax.swing.JButton bill_btn;
+    private javax.swing.JButton delete_btn;
+    private javax.swing.JButton insert_btn;
+    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField txt_billNo;
+    private javax.swing.JTextField txt_num;
+    private javax.swing.JTextField txt_price;
+    private javax.swing.JTextField txt_total;
+    // End of variables declaration//GEN-END:variables
+}
